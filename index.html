@@ -7,6 +7,13 @@
       body { height: 100%; margin: 0; padding: 0 }
       #map-canvas { height: 100% }
 
+      .options{
+        height: 32px;
+        outline: none;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        font-family: Roboto; 
+        color: #8f8f8f;
+      }
       .controls {
         margin-top: 16px;
         border: 1px solid transparent;
@@ -59,6 +66,10 @@
       window.rm = {
         workMarkers: [],
         workCircles: [],
+        trainMarkers: [],
+        trainCircles: [],
+        housingMarkers: [],
+        housingCircles: [],
       };
 
       function initialize() {
@@ -105,7 +116,7 @@
         transitLayer.setMap(map);
 
         var drawingManager = new google.maps.drawing.DrawingManager();
-        drawingManager.setMap(map);
+        //drawingManager.setMap(map);
 
         //Icon images
         var trainimage = 'http://i57.tinypic.com/2mxgaxe.png';
@@ -125,7 +136,7 @@
           radius: 10000,
           fillColor: '#78AB46',
           strokeColor: '#78AB46',
-          strokeWeight: 2,
+          strokeWeight: 1,
         });
         citycircle.bindTo('center', melbourne, 'position');
 
@@ -194,20 +205,23 @@
         ];
 
         trainStationLocations.forEach(function(location) {
-          var trainstation = new google.maps.Marker({
+          var trainMarker = new google.maps.Marker({
             map: map,
             position: location,
             title: 'Train Stations',
             icon: trainimage,
           }); 
-          var traincircle = new google.maps.Circle({
+          var trainCircle = new google.maps.Circle({
             map: map,
             radius: 500,
             fillColor: '#79CDCD',
             strokeColor: '#79CDCD',
             strokeWeight: 1,
           });
-          traincircle.bindTo('center', trainstation, 'position');
+          trainCircle.bindTo('center', trainMarker, 'position');
+
+          window.rm.trainMarkers.push(trainMarker);
+          window.rm.trainCircles.push(trainCircle);
         });
 
         var publicHousingLocations = [
@@ -231,20 +245,23 @@
         ];
 
         publicHousingLocations.forEach(function(location) {
-          var publichousing = new google.maps.Marker({
+          var housingMarker = new google.maps.Marker({
             map: map,
             position: location,
             title: 'Public Housing',
             icon: housingimage
           }); 
-          var traincircle = new google.maps.Circle({
+          var housingCircle = new google.maps.Circle({
             map: map,
             radius: 200,
             fillColor: '#A8A8A8',
             strokeColor: '#A8A8A8',
             strokeWeight: 1,
           });
-          traincircle.bindTo('center', publichousing, 'position');
+          housingCircle.bindTo('center', housingMarker, 'position');
+
+          window.rm.housingMarkers.push(housingMarker);
+          window.rm.housingCircles.push(housingCircle);
         });
       }
       google.maps.event.addDomListener(window, 'load', initialize);
@@ -259,19 +276,41 @@
           workCircle.setVisible(workChecked);
         });
       }
+      function checkTrain() 
+      {
+        var trainChecked = document.getElementById('trains').checked;
+        window.rm.trainMarkers.forEach(function(trainMarker) {
+          trainMarker.setVisible(trainChecked);
+        });
+        window.rm.trainCircles.forEach(function(trainCircle) {
+          trainCircle.setVisible(trainChecked);
+        });
+      }
+      function checkHousing() 
+      {
+        var housingChecked = document.getElementById('housing').checked;
+        window.rm.housingMarkers.forEach(function(housingMarker) {
+          housingMarker.setVisible(housingChecked);
+        });
+        window.rm.housingCircles.forEach(function(housingCircle) {
+          housingCircle.setVisible(housingChecked);
+        });
+      }
     </script>
   </head>
   <body>
      <input id="pac-input" class="controls" type="text" placeholder="Search Box">
-     <label>
-        <input type="checkbox" id="work" checked="checked" onclick="checkWork()" />Work
+     <div class="options">
+       <label>
+          <input type="checkbox" id="work" checked="checked" onclick="checkWork()" />Work
+        </label>
+        <label>
+          <input type="checkbox" id="trains" checked="checked" onclick="checkTrain()" />Train Stations
+        </label>
+        <label>
+          <input type="checkbox" id="housing" checked="checked" onclick="checkHousing()" />Public Housing
       </label>
-      <label>
-        <input type="checkbox" id="trainstations" onclick="check()" />Train Stations
-      </label>
-      <label>
-        <input type="checkbox" id="publichousing" onclick="check()" />Public Housing
-    </label>
+    </div>
     <div id="map-canvas"/>
   </body>
 </html>
