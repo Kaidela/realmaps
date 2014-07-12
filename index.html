@@ -56,6 +56,11 @@
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCB_1MKbUobd0JKzRLyzkMlfeVU7ON5fUc&libraries=drawing,places">
     </script>
     <script type="text/javascript">
+      window.rm = {
+        workMarkers: [],
+        workCircles: [],
+      };
+
       function initialize() {
         var mapOptions = {
           center: new google.maps.LatLng(-37.8136, 144.9631),
@@ -102,6 +107,12 @@
         var drawingManager = new google.maps.drawing.DrawingManager();
         drawingManager.setMap(map);
 
+        //Icon images
+        var trainimage = 'http://i57.tinypic.com/2mxgaxe.png';
+        var housingimage = 'http://i62.tinypic.com/bi1dgo.png';
+        var workimage = 'http://i60.tinypic.com/292wwfl.png';
+
+
         // Create marker 
         var melbourne = new google.maps.Marker({
           map: map,
@@ -117,6 +128,31 @@
           strokeWeight: 2,
         });
         citycircle.bindTo('center', melbourne, 'position');
+
+        var workLocations = [
+          new google.maps.LatLng(-37.838307,144.995405),
+          new google.maps.LatLng(-37.817738,144.961614),
+        ];
+
+        workLocations.forEach(function(location) {
+          var workMarker = new google.maps.Marker({
+            map: map,
+            position: location,
+            title: 'Work',
+            icon: workimage,
+          }); 
+          var workCircle = new google.maps.Circle({
+            map: map,
+            radius: 5000,
+            fillColor: '#FCDC3B',
+            strokeColor: '#FCDC3B',
+            strokeWeight: 1,
+          });
+          workCircle.bindTo('center', workMarker, 'position');
+          
+          window.rm.workMarkers.push(workMarker);
+          window.rm.workCircles.push(workCircle);
+        });
 
         var trainStationLocations = [
           new google.maps.LatLng(-37.823928,144.989775),
@@ -161,7 +197,8 @@
           var trainstation = new google.maps.Marker({
             map: map,
             position: location,
-            title: 'Train Stations'
+            title: 'Train Stations',
+            icon: trainimage,
           }); 
           var traincircle = new google.maps.Circle({
             map: map,
@@ -172,6 +209,7 @@
           });
           traincircle.bindTo('center', trainstation, 'position');
         });
+
         var publicHousingLocations = [
           new google.maps.LatLng(-37.846458,144.949037),
           new google.maps.LatLng(-37.775199,144.956934),
@@ -196,7 +234,8 @@
           var publichousing = new google.maps.Marker({
             map: map,
             position: location,
-            title: 'Public Housing'
+            title: 'Public Housing',
+            icon: housingimage
           }); 
           var traincircle = new google.maps.Circle({
             map: map,
@@ -209,10 +248,30 @@
         });
       }
       google.maps.event.addDomListener(window, 'load', initialize);
+
+      function checkWork() 
+      {
+        var workChecked = document.getElementById('work').checked;
+        window.rm.workMarkers.forEach(function(workMarker) {
+          workMarker.setVisible(workChecked);
+        });
+        window.rm.workCircles.forEach(function(workCircle) {
+          workCircle.setVisible(workChecked);
+        });
+      }
     </script>
   </head>
   <body>
      <input id="pac-input" class="controls" type="text" placeholder="Search Box">
+     <label>
+        <input type="checkbox" id="work" checked="checked" onclick="checkWork()" />Work
+      </label>
+      <label>
+        <input type="checkbox" id="trainstations" onclick="check()" />Train Stations
+      </label>
+      <label>
+        <input type="checkbox" id="publichousing" onclick="check()" />Public Housing
+    </label>
     <div id="map-canvas"/>
   </body>
 </html>
