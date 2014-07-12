@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <style type="text/css">
+      html { height: 100% }
+      body { height: 100%; margin: 0; padding: 0 }
+      #map-canvas { height: 100% }
+
+      .controls {
+        margin-top: 16px;
+        border: 1px solid transparent;
+        border-radius: 2px 0 0 2px;
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        height: 32px;
+        outline: none;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      }
+
+      #pac-input {
+        background-color: #fff;
+        padding: 0 11px 0 13px;
+        width: 400px;
+        font-family: Roboto;
+        font-size: 15px;
+        font-weight: 300;
+        text-overflow: ellipsis;
+      }
+
+      #pac-input:focus {
+        border-color: #4d90fe;
+        margin-left: -1px;
+        padding-left: 14px;  /* Regular padding-left + 1. */
+        width: 401px;
+      }
+
+      .pac-container {
+        font-family: Roboto;
+      }
+
+      #type-selector {
+        color: #fff;
+        background-color: #4d90fe;
+        padding: 5px 11px 0px 11px;
+      }
+
+      #type-selector label {
+        font-family: Roboto;
+        font-size: 13px;
+        font-weight: 300;
+      }
+
+    </style>
+    <script type="text/javascript"
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCB_1MKbUobd0JKzRLyzkMlfeVU7ON5fUc&libraries=drawing,places">
+    </script>
+    <script type="text/javascript">
+      function initialize() {
+        var mapOptions = {
+          center: new google.maps.LatLng(-37.8136, 144.9631),
+          zoom: 12,
+        };
+
+        var map = new google.maps.Map(document.getElementById("map-canvas"),
+            mapOptions);
+
+        var input = document.getElementById('pac-input');
+        map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+
+        var searchBox = new google.maps.places.SearchBox(input);
+        var markers = [];
+        google.maps.event.addListener(searchBox, 'places_changed', function() {
+          var places = searchBox.getPlaces();
+          if (places.length == 0) {
+            return;
+          }
+          for (var i = 0, marker; marker = markers[i]; i++) {
+            marker.setMap(null);
+          }
+          markers = [];
+          var bounds = new google.maps.LatLngBounds();
+          for (var i = 0, place; place = places[i]; i++) {
+            // Create a marker for each place.
+            var marker = new google.maps.Marker({
+              map: map,
+              title: place.name,
+              position: place.geometry.location
+            });
+
+            markers.push(marker);
+
+            bounds.extend(place.geometry.location);
+          }
+
+          map.fitBounds(bounds);
+        });
+
+        var transitLayer = new google.maps.TransitLayer();
+        transitLayer.setMap(map);
+
+        var drawingManager = new google.maps.drawing.DrawingManager();
+        drawingManager.setMap(map);
+
+        // Create marker 
+        var melbourne = new google.maps.Marker({
+          map: map,
+          position: new google.maps.LatLng(-37.8136, 144.9631),
+          title: 'Melbourne'
+        });
+        // Add circle overlay and bind to marker
+        var citycircle = new google.maps.Circle({
+          map: map,
+          radius: 10000,
+          fillColor: '#78AB46',
+          strokeColor: '#78AB46',
+          strokeWeight: 2,
+        });
+        citycircle.bindTo('center', melbourne, 'position');
+
+        var trainStationLocations = [
+          new google.maps.LatLng(-37.823928,144.989775),
+          new google.maps.LatLng(-37.826459,144.996732),
+          new google.maps.LatLng(-37.827697,145.007311),
+          new google.maps.LatLng(-37.822002,145.023061),
+          new google.maps.LatLng(-37.821595,145.036408),
+          new google.maps.LatLng(-37.834984,145.02261),
+          new google.maps.LatLng(-37.839797,145.033125),
+          new google.maps.LatLng(-37.849235,145.041515),
+          new google.maps.LatLng(-37.83839,144.992398),
+          new google.maps.LatLng(-37.844423,145.001582),
+          new google.maps.LatLng(-37.85098,145.014113),
+          new google.maps.LatLng(-37.849811,144.989887),
+          new google.maps.LatLng(-37.856097,144.992012),
+          new google.maps.LatLng(-37.869548,144.993664),
+          new google.maps.LatLng(-37.876357,144.995402),
+          new google.maps.LatLng(-37.884436,145.000616),
+          new google.maps.LatLng(-37.896696,145.004135),
+          new google.maps.LatLng(-37.816561,144.984008),
+          new google.maps.LatLng(-37.814781,144.991475),
+          new google.maps.LatLng(-37.810119,144.992377),
+          new google.maps.LatLng(-37.804524,144.994007),
+          new google.maps.LatLng(-37.799235,144.994351),
+          new google.maps.LatLng(-37.788688,144.995424),
+          new google.maps.LatLng(-37.780989,144.999028),
+          new google.maps.LatLng(-37.779547,145.00759),
+          new google.maps.LatLng(-37.779191,145.016838),
+          new google.maps.LatLng(-37.778394,145.031601),
+          new google.maps.LatLng(-37.774849,145.038532),
+          new google.maps.LatLng(-37.774642,144.958656), 
+          new google.maps.LatLng(-37.780985,144.952176), 
+          new google.maps.LatLng(-37.787938,144.939344), 
+          new google.maps.LatLng(-37.79489,144.936168), 
+          new google.maps.LatLng(-37.80703,144.941747),
+          new google.maps.LatLng(-37.770062,144.995134),
+          new google.maps.LatLng(-37.77722,144.993117),
+          new google.maps.LatLng(-37.78285,144.991744),
+        ];
+
+        trainStationLocations.forEach(function(location) {
+          var trainstation = new google.maps.Marker({
+            map: map,
+            position: location,
+            title: 'Train Stations'
+          }); 
+          var traincircle = new google.maps.Circle({
+            map: map,
+            radius: 500,
+            fillColor: '#79CDCD',
+            strokeColor: '#79CDCD',
+            strokeWeight: 1,
+          });
+          traincircle.bindTo('center', trainstation, 'position');
+        });
+        var publicHousingLocations = [
+          new google.maps.LatLng(-37.846458,144.949037),
+          new google.maps.LatLng(-37.775199,144.956934),
+          new google.maps.LatLng(-37.797295,144.974261),
+          new google.maps.LatLng(-37.794684,144.968757),
+          new google.maps.LatLng(-37.801559,144.991974),
+          new google.maps.LatLng(-37.801085,144.987479),
+          new google.maps.LatLng(-37.804103,144.978585),
+          new google.maps.LatLng(-37.787605,144.936292),
+          new google.maps.LatLng(-37.83574,144.957556),
+          new google.maps.LatLng(-37.831987,144.962127),
+          new google.maps.LatLng(-37.783772,145.005117),
+          new google.maps.LatLng(-37.84584,144.995772),
+          new google.maps.LatLng(-37.84972,144.99574),
+          new google.maps.LatLng(-37.812306,144.997848),
+          new google.maps.LatLng(-37.814723,144.996663),
+          new google.maps.LatLng(-37.864747,144.989195),
+          new google.maps.LatLng(-37.853588,144.986425),
+        ];
+
+        publicHousingLocations.forEach(function(location) {
+          var publichousing = new google.maps.Marker({
+            map: map,
+            position: location,
+            title: 'Public Housing'
+          }); 
+          var traincircle = new google.maps.Circle({
+            map: map,
+            radius: 200,
+            fillColor: '#A8A8A8',
+            strokeColor: '#A8A8A8',
+            strokeWeight: 1,
+          });
+          traincircle.bindTo('center', publichousing, 'position');
+        });
+      }
+      google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+  </head>
+  <body>
+     <input id="pac-input" class="controls" type="text" placeholder="Search Box">
+    <div id="map-canvas"/>
+  </body>
+</html>
